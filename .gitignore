@@ -1,0 +1,6 @@
+__pycache__/
+__pypackages__/
+.vscode/
+.DS_Store
+.pdm.toml
+*.pdn
