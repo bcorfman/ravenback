@@ -1,10 +1,12 @@
-from serve import serve_api
-from playwright.sync_api import sync_playwright
+import pytest
+from httpx import AsyncClient
 
-def test_valid_moves_http():
-    with serve_api() as _:
-        with sync_playwright() as p:
-            context = p.request.new_context()
-            response = context.get("http://localhost:8000/valid_moves?black_men=11,15&black_kings=19&white_men=30,31&white_kings=29&player_to_move=black")
-            assert response.ok
-            assert response.json()["output"] == "1,2,3"
+from checkers import app
+
+
+@pytest.mark.anyio
+async def test_legal_moves():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.get("/legal_moves/?to_move=black")
+    assert response.status_code == 200
+    assert response.json() == {"output": "1,2,3"}

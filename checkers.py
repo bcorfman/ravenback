@@ -1,14 +1,28 @@
-import hug
-from waitress import serve
+from fastapi import FastAPI, Query
+from pydantic import Required
 
 
-@hug.get(examples="black_men=11,15&black_kings=19&white_men=30,31&white_kings=29&player_to_move=black")
-@hug.local()
-def valid_moves(black_men: hug.types.delimited_list(","), black_kings: hug.types.delimited_list(","),
-                white_men: hug.types.delimited_list(","), white_kings: hug.types.delimited_list(","),
-                player_to_move: hug.types.one_of(("black", "white"))):
-    return {"output": "1,2,3"}
+app = FastAPI()
+
+#http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
+@app.get("/legal_moves/")
+async def legal_moves(to_move: str=Query(default=Required, title="Player to move", 
+                                         regex=r"\b(black|white)\b",
+                                         description="black or white are valid selections"),
+                      bm: list[int]=Query(default=None, title="Black men", description="Values 1-32"), 
+                      bk: list[int]=Query(default=None, title="Black kings", description="Values 1-32"), 
+                      wm: list[int]=Query(default=None, title="White men", description="Values 1-32"), 
+                      wk: list[int]=Query(default=None, title="White kings", description="Values 1-32")):
+        return {"output": "1,2,3"}
 
 
-def start_server():
-    serve(__hug_wsgi__, host="127.0.0.1", port=8000)
+if __name__ == "__main__":
+    import asyncio
+    from hypercorn.asyncio import serve
+    from hypercorn.config import Config
+
+    config = Config()
+    config.bind = ["localhost:8000"]
+
+    asyncio.run(serve(app, config))
+

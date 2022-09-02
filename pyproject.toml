@@ -6,8 +6,8 @@ authors = [
     {name = "Brandon Corfman", email = "bcorfman1@gmail.com"},
 ]
 dependencies = [
-    "hug>=2.6.1",
-    "waitress>=2.1.2",
+    "fastapi>=0.81.0",
+    "hypercorn>=0.14.1",
 ]
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -27,4 +27,6 @@ dev = [
     "pytest>=7.1.2",
     "playwright>=1.25.1",
     "pytest-playwright>=0.3.0",
+    "anyio>=3.6.1",
+    "httpx>=0.23.0",
 ]
