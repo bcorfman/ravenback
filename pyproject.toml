@@ -8,6 +8,7 @@ authors = [
 dependencies = [
     "fastapi>=0.81.0",
     "hypercorn>=0.14.1",
+    "trio>=0.21.0",
 ]
 requires-python = ">=3.10"
 license = {text = "MIT"}
