@@ -26,8 +26,6 @@ build-backend = "pdm.pep517.api"
 [tool.pdm.dev-dependencies]
 dev = [
     "pytest>=7.1.2",
-    "playwright>=1.25.1",
-    "pytest-playwright>=0.3.0",
     "anyio>=3.6.1",
     "httpx>=0.23.0",
 ]
