@@ -4,7 +4,7 @@ from pydantic import Required
 
 app = FastAPI()
 
-#http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
+# example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
 @app.get("/legal_moves/")
 async def legal_moves(to_move: str=Query(default=Required, title="Player to move", 
                                          regex=r"\b(black|white)\b",

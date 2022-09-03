@@ -10,7 +10,7 @@ dependencies = [
     "hypercorn>=0.14.1",
     "trio>=0.21.0",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 license = {text = "MIT"}
 [project.optional-dependencies]
 cli = [
