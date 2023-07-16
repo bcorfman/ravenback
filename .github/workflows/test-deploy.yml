@@ -1,0 +1,43 @@
+name: Python build and test
+on: [push, pull_request]
+
+jobs:
+  build-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Deta Space CLI
+        run: |
+          curl -fsSL https://deta.space/assets/space-cli.sh | sh
+      - name: Install prerequisites
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+      - name: Install project (incl. dev) dependencies
+        run: |
+          pipenv install --dev
+      - name: Write env variables to env.txt file
+        run: |
+          touch env.txt
+          # echo DETA_SPACE_DATA_KEY=${{ secrets.DETA_SPACE_DATA_KEY }} >> env.txt
+          # echo GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> env.txt
+          # echo GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} >> env.txt
+          # echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> env.txt
+      - name: Test with pytest
+        run: pipenv run pytest
+      - name: Push working code to Deta Space
+        env:
+          DETA_SPACE_TOKEN: ${{ secrets.DETA_SPACE_TOKEN }}
+          DETA_PROJECT_ID: ${{ secrets.DETA_PROJECT_ID }}
+        run: |
+          $HOME/.detaspace/bin/space login -t <<<"$DETA_SPACE_TOKEN"
+          $HOME/.detaspace/bin/space link -i $DETA_PROJECT_ID
+          $HOME/.detaspace/bin/space push
