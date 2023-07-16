@@ -26,7 +26,7 @@ async def legal_moves(to_move: Annotated[str, Query(title="Player to move", patt
     if len(wk) != len(swk):
         raise HTTPException(status_code=422,
                             detail="Repeated values for white kings")
-    if not sbm.isdisjoint(sbk.isdisjoint(swm.isdisjoint(swk))):
+    if len(bm + bk + wm + wk) != len(sbm | sbk | swm | swk):
         raise HTTPException(status_code=422,
                             detail="Overlapping checker values")
     return {"output": "1,2,3"}
