@@ -10,6 +10,7 @@ uvicorn = {version = "*", extras = ["standard"]}
 httpx = "*"
 authlib = "*"
 itsdangerous = "*"
+trio = "*"
 
 [dev-packages]
 ipython = "*"
