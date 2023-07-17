@@ -15,7 +15,7 @@ def test_legal_moves_repeated_values_black_kings():
     response = client.get(
         '/legal_moves/?to_move=white&bk=27&bk=27&wk=10&wk=15&wk=19')
     assert response.status_code == 422  # unprocessable content
-    assert response.text == "Repeated values for black kings"
+    assert response.json() == {"detail": "Repeated values for black kings"}
 
 
 def test_legal_moves_repeated_values_white_kings():
@@ -23,4 +23,4 @@ def test_legal_moves_repeated_values_white_kings():
     response = client.get(
         '/legal_moves/?to_move=white&bk=9&bk=27&wk=15&wk=15&wk=19')
     assert response.status_code == 422  # unprocessable content
-    assert response.text == "Repeated values for white kings"
+    assert response.json() == {"detail": "Repeated values for white kings"}

@@ -10,10 +10,11 @@ app = FastAPI()
 async def legal_moves(to_move: Annotated[str, Query(title="Player to move", pattern=r"\b(black|white)\b",
                                                     description="black or white are valid selections")],
                       bm: Annotated[List[int], Query(title="Black men",
-                                                     description="Squares with black men")],
-                      bk: Annotated[List[int], Query(title="Black kings", description="Squares with black kings")],
-                      wm: Annotated[List[int], Query(title="White men", description="Squares with white men")],
-                      wk: Annotated[List[int], Query(title="White kings", description="Squares with white kings")]):
+                                                     description="Squares with black men")] = [],
+                      bk: Annotated[List[int], Query(title="Black kings", description="Squares with black kings")] = [],
+                      wm: Annotated[List[int], Query(title="White men", description="Squares with white men")] = [],
+                      wk: Annotated[List[int], Query(title="White kings",
+                                                     description="Squares with white kings")] = []):
     sbm, sbk, swm, swk = set(bm), set(bk), set(wm), set(wk)
     if len(bm) != len(sbm):
         raise HTTPException(status_code=422, detail="Repeated values for black men")
