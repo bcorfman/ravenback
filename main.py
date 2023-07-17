@@ -29,7 +29,7 @@ async def legal_moves(to_move: Annotated[str, Query(title="Player to move", patt
     if len(bm + bk + wm + wk) != len(sbm | sbk | swm | swk):
         raise HTTPException(status_code=422,
                             detail="Overlapping checker values")
-    if any(1 > e > 32 for e in sbm | sbk | swm | swk):
+    if not all(1 <= e <= 32 for e in sbm | sbk | swm | swk):
         raise HTTPException(status_code=422,
                             detail="Valid checker values range from 1-32")
     return {"output": "1,2,3"}
