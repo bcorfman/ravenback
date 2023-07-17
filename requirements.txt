@@ -1,7 +1,5 @@
 fastapi
 uvicorn[standard]
 deta
-authlib
 httpx
 itsdangerous
-trio
