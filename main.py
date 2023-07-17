@@ -2,6 +2,9 @@ from typing import Annotated, List
 
 from fastapi import FastAPI, HTTPException, Query
 
+from game.checkers import Checkers
+from util.globalconst import BLACK, KING, MAN, WHITE, square_map
+
 app = FastAPI()
 
 
@@ -33,4 +36,21 @@ async def legal_moves(to_move: Annotated[str, Query(title="Player to move", patt
     if not all(1 <= e <= 32 for e in sbm | sbk | swm | swk):
         raise HTTPException(status_code=422,
                             detail="Valid checker values range from 1-32")
-    return {"output": "1,2,3"}
+
+    state = Checkers()
+    state.clear()
+    sq = state.squares
+    for item in wm:
+        idx = square_map[item]
+        sq[idx] = WHITE | MAN
+    for item in wk:
+        idx = square_map[item]
+        sq[idx] = WHITE | KING
+    for item in bm:
+        idx = square_map[item]
+        sq[idx] = BLACK | MAN
+    for item in bk:
+        idx = square_map[item]
+        sq[idx] = BLACK | KING
+    state.to_move = to_move
+    return {"legal_moves": str(state.legal_moves())}
