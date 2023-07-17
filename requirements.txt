@@ -4,3 +4,4 @@ deta
 authlib
 httpx
 itsdangerous
+trio
