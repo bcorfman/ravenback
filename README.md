@@ -2,7 +2,7 @@
 
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=527823637&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=EastUs)
 
-A FastAPI ASGI microservice to the Raven Checkers game engine, deployed on the Deta Space cloud via [GitHub Actions](https://github.com/bcorfman/raven/blob/main/.github/workflows/test-deploy.yml).)
+A FastAPI ASGI microservice to the [Raven Checkers](https://github.com/bcorfman/raven-checkers) game engine, deployed on the Deta Space cloud via [GitHub Actions](https://github.com/bcorfman/raven/blob/main/.github/workflows/test-deploy.yml).)
 
 I'm using this project to practice simple microservice design with Python.
 
