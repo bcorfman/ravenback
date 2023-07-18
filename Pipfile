@@ -9,6 +9,8 @@ deta = "*"
 uvicorn = {version = "*", extras = ["standard"]}
 httpx = "*"
 itsdangerous = "*"
+charset-normalizer = "*"
+pyparsing = "*"
 
 [dev-packages]
 flake8 = "*"
