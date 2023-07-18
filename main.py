@@ -1,9 +1,10 @@
 from typing import Annotated, List
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import JSONResponse
 
 from game.checkers import Checkers
-from util.globalconst import BLACK, KING, MAN, WHITE, square_map
+from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
 app = FastAPI()
 
@@ -37,9 +38,9 @@ async def legal_moves(to_move: Annotated[str, Query(title="Player to move", patt
         raise HTTPException(status_code=422,
                             detail="Valid checker values range from 1-32")
 
-    state = Checkers()
-    state.clear()
-    sq = state.squares
+    board = Checkers()
+    board.curr_state.clear()
+    sq = board.curr_state.squares
     for item in wm:
         idx = square_map[item]
         sq[idx] = WHITE | MAN
@@ -52,5 +53,21 @@ async def legal_moves(to_move: Annotated[str, Query(title="Player to move", patt
     for item in bk:
         idx = square_map[item]
         sq[idx] = BLACK | KING
-    state.to_move = to_move
-    return {"legal_moves": str(state.legal_moves())}
+    board.curr_state.to_move = BLACK if to_move == "black" else WHITE
+
+    captures = []
+    for capture in board.curr_state.captures:
+        jump = []
+        for affected_square in capture.affected_squares[::2]:
+            jump.append(keymap[affected_square[0]])
+        captures.append(jump)
+
+    moves = []
+    for move in board.curr_state.moves:
+        squares = []
+        for affected_square in move.affected_squares:
+            squares.append(keymap[affected_square[0]])
+        moves.append(squares)
+    captures.sort()
+    moves.sort()
+    return JSONResponse({"captures": captures, "moves": moves})
