@@ -83,3 +83,12 @@ async def legal_moves(
     captures.sort()
     moves.sort()
     return JSONResponse({"captures": captures, "moves": moves})
+
+
+@app.get("/cb_state/")
+async def get_checkerboard_state():
+    return JSONResponse({"to_move": "black", 
+                         "black_men": list(range(1, 13)),
+                         "black_kings": [],
+                         "white_men": list(range(21, 33)),
+                         "white_kings": []})
