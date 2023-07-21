@@ -1,12 +1,15 @@
+from secrets import token_urlsafe
 from typing import Annotated, List
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
+from starlette.middleware.sessions import SessionMiddleware
 
 from game.checkers import Checkers
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
 app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key=token_urlsafe, max_age=None, same_site='Strict', https_only=True)
 
 
 # example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
@@ -87,7 +90,7 @@ async def legal_moves(
 
 @app.get("/cb_state/")
 async def get_checkerboard_state():
-    return JSONResponse({"to_move": "black", 
+    return JSONResponse({"to_move": "black",
                          "black_men": list(range(1, 13)),
                          "black_kings": [],
                          "white_men": list(range(21, 33)),
