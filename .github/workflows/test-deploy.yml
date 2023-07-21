@@ -28,9 +28,7 @@ jobs:
         run: |
           touch env.txt
           # echo DETA_SPACE_DATA_KEY=${{ secrets.DETA_SPACE_DATA_KEY }} >> env.txt
-          # echo GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> env.txt
-          # echo GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} >> env.txt
-          # echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> env.txt
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> env.txt
       - name: Test with pytest
         run: pipenv run pytest
       - name: Push working code to Deta Space

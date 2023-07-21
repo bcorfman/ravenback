@@ -1,15 +1,18 @@
-from secrets import token_urlsafe
 from typing import Annotated, List
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
+from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
 
 from game.checkers import Checkers
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
+starlette_config = Config('env.txt')
+
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=token_urlsafe, max_age=None, same_site='Strict', https_only=True)
+app.add_middleware(SessionMiddleware,
+                   secret_key=starlette_config.get('SECRET_KEY'), max_age=None, same_site='Strict')
 
 
 # example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
