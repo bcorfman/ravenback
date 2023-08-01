@@ -4,15 +4,37 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
-
+from deta import Deta
 from game.checkers import Checkers
+from parsing.PDN import translate_to_fen
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
 starlette_config = Config('env.txt')
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware,
-                   secret_key=starlette_config.get('SECRET_KEY'), max_age=None, same_site='Strict')
+                   secret_key=starlette_config.get('SECRET_KEY'),
+                   max_age=None,
+                   same_site='Strict')
+
+
+@app.post("/create_session/")
+async def create_session():
+    board = Checkers()
+    state = board.curr_state
+    next_to_move = "black" if state.to_move == BLACK else "white"
+    black_men = [piece for piece in state.black_pieces if not (piece & KING)]
+    black_kings = [piece for piece in state.black_pieces if (piece & KING)]
+    white_men = [piece for piece in state.white_pieces if not (piece & KING)]
+    white_kings = [piece for piece in state.white_pieces if (piece & KING)]
+    fen = {
+        "session":
+        translate_to_fen(next_to_move, black_men, white_men, black_kings,
+                         white_kings)
+    }
+    deta = Deta()
+    db = deta.Base("raven_db")
+    d = db.put(fen)
 
 
 # example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
@@ -93,8 +115,10 @@ async def legal_moves(
 
 @app.get("/cb_state/")
 async def get_checkerboard_state():
-    return JSONResponse({"to_move": "black",
-                         "black_men": list(range(1, 13)),
-                         "black_kings": [],
-                         "white_men": list(range(21, 33)),
-                         "white_kings": []})
+    return JSONResponse({
+        "to_move": "black",
+        "black_men": list(range(1, 13)),
+        "black_kings": [],
+        "white_men": list(range(21, 33)),
+        "white_kings": []
+    })
