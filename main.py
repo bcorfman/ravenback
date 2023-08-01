@@ -1,10 +1,11 @@
 from typing import Annotated, List
 
+from deta import Deta
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
-from deta import Deta
+
 from game.checkers import Checkers
 from parsing.PDN import translate_to_fen
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
@@ -23,18 +24,21 @@ async def create_session():
     board = Checkers()
     state = board.curr_state
     next_to_move = "black" if state.to_move == BLACK else "white"
-    black_men = [piece for piece in state.black_pieces if not (piece & KING)]
-    black_kings = [piece for piece in state.black_pieces if (piece & KING)]
-    white_men = [piece for piece in state.white_pieces if not (piece & KING)]
-    white_kings = [piece for piece in state.white_pieces if (piece & KING)]
+    black_men, black_kings, white_men, white_kings = [], [], [], []
+    for piece in state.get_pieces(BLACK):
+        black_kings.append(piece) if piece & KING else black_men.append(piece)
+    for piece in state.get_pieces(WHITE):
+        white_kings.append(piece) if piece & KING else white_men.append(piece)
     fen = {
-        "session":
+        "fen":
         translate_to_fen(next_to_move, black_men, white_men, black_kings,
-                         white_kings)
+                         white_kings),
+        "move": 1
     }
     deta = Deta()
     db = deta.Base("raven_db")
     d = db.put(fen)
+    return JSONResponse(d)
 
 
 # example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
