@@ -7,7 +7,7 @@ from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
 
 from game.checkers import Checkers
-from parsing.PDN import translate_to_fen
+from parsing.PDN import PDNReader, PDNWriter
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
 starlette_config = Config('env.txt')
@@ -23,16 +23,19 @@ app.add_middleware(SessionMiddleware,
 async def create_session():
     board = Checkers()
     state = board.curr_state
-    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state()
-    fen = {
-        "fen":
-        translate_to_fen(next_to_move, black_men, white_men, black_kings,
-                         white_kings),
-        "move": 1
+    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
+    )
+    pdn = {
+        "pdn":
+        PDNWriter.to_string('', '', '', '', '', '', next_to_move, black_men,
+                            white_men, black_kings, white_kings, '',
+                            'white_on_top', []),
+        "move":
+        1
     }
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base("raven_db")
-    d = db.put(fen)
+    d = db.put(pdn, starlette_config.get('DETA_PROJECT_ID'))
     return JSONResponse(d)
 
 
@@ -114,10 +117,27 @@ async def legal_moves(
 
 @app.get("/cb_state/")
 async def get_checkerboard_state():
+    deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
+    db = deta.Base("raven_db")
+    result = db.get(starlette_config.get('DETA_PROJECT_ID'))
+    latest_move = 0
+    pdn = ''
+    for item in result:
+        if item['move'] > latest_move:
+            latest_move = item['move']
+            pdn = item['pdn']
+    reader = PDNReader.from_string(pdn)
+    game_params = reader.read_game(0)
+    board = Checkers()
+    state = board.curr_state
+    state.setup_game(game_params)
+    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
+    )
+
     return JSONResponse({
-        "to_move": "black",
-        "black_men": list(range(1, 13)),
-        "black_kings": [],
-        "white_men": list(range(21, 33)),
-        "white_kings": []
+        "to_move": next_to_move,
+        "black_men": black_men,
+        "black_kings": black_kings,
+        "white_men": white_men,
+        "white_kings": white_kings
     })
