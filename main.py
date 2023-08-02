@@ -23,19 +23,14 @@ app.add_middleware(SessionMiddleware,
 async def create_session():
     board = Checkers()
     state = board.curr_state
-    next_to_move = "black" if state.to_move == BLACK else "white"
-    black_men, black_kings, white_men, white_kings = [], [], [], []
-    for piece in state.get_pieces(BLACK):
-        black_kings.append(piece) if piece & KING else black_men.append(piece)
-    for piece in state.get_pieces(WHITE):
-        white_kings.append(piece) if piece & KING else white_men.append(piece)
+    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state()
     fen = {
         "fen":
         translate_to_fen(next_to_move, black_men, white_men, black_kings,
                          white_kings),
         "move": 1
     }
-    deta = Deta()
+    deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base("raven_db")
     d = db.put(fen)
     return JSONResponse(d)

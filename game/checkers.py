@@ -1,11 +1,13 @@
-import ai.games as games
 import time
+
+import ai.games as games
 from base.move import Move
-from util.globalconst import BLACK, WHITE, KING, MAN, OCCUPIED, BLACK_CHAR, WHITE_CHAR
-from util.globalconst import BLACK_KING, WHITE_KING, FREE, OCCUPIED_CHAR, FREE_CHAR
-from util.globalconst import COLORS, TYPES, TURN, CRAMP, BRV, KEV, KCV, MEV, MCV
-from util.globalconst import INTACT_DOUBLE_CORNER, ENDGAME, OPENING, MIDGAME
-from util.globalconst import create_grid_map, KING_IDX, BLACK_IDX, WHITE_IDX
+from util.globalconst import (BLACK, BLACK_CHAR, BLACK_IDX, BLACK_KING, BRV,
+                              COLORS, CRAMP, ENDGAME, FREE, FREE_CHAR,
+                              INTACT_DOUBLE_CORNER, KCV, KEV, KING, KING_IDX,
+                              MAN, MCV, MEV, MIDGAME, OCCUPIED, OCCUPIED_CHAR,
+                              OPENING, TURN, TYPES, WHITE, WHITE_CHAR,
+                              WHITE_IDX, WHITE_KING, create_grid_map, keymap)
 
 
 class Checkerboard(object):
@@ -45,12 +47,8 @@ class Checkerboard(object):
                             BLACK | KING: BLACK_KING, WHITE | KING: WHITE_KING,
                             OCCUPIED: OCCUPIED_CHAR, FREE: FREE_CHAR}
         self.observers = []
-        self.white_pieces = []
-        self.black_pieces = []
         self.undo_list = []
         self.redo_list = []
-        self.white_total = 12
-        self.black_total = 12
         self.grid_map = create_grid_map()
         self.ok_to_move = True
 
@@ -107,11 +105,22 @@ class Checkerboard(object):
     def lookup(self, square):
         return self.char_lookup[square & TYPES]
 
-    def count(self, color):
-        return self.white_total if color == WHITE else self.black_total
-
-    def get_pieces(self, color):
-        return self.black_pieces if color == BLACK else self.white_pieces
+    def save_board_state(self):
+        to_move = 'black' if self.to_move == BLACK else 'white'
+        black_men = []
+        black_kings = []
+        white_men = []
+        white_kings = []
+        for i, sq in enumerate(self.squares):
+            if sq == BLACK | MAN:
+                black_men.append(keymap[i])
+            elif sq == BLACK | KING:
+                black_kings.append(keymap[i])
+            elif sq == WHITE | MAN:
+                white_men.append(keymap[i])
+            elif sq == WHITE | KING:
+                white_kings.append(keymap[i])
+        return to_move, black_men, black_kings, white_men, white_kings
 
     def has_opposition(self, color):
         sq = self.squares
@@ -125,20 +134,6 @@ class Checkerboard(object):
 
     def row_col_for_index(self, idx):
         return self.grid_map[idx]
-
-    def update_piece_count(self):
-        self.white_pieces = []
-        for i, piece in enumerate(self.squares):
-            if piece & COLORS == WHITE:
-                self.white_pieces.append((i, piece))
-
-        self.black_pieces = []
-        for i, piece in enumerate(self.squares):
-            if piece & COLORS == BLACK:
-                self.black_pieces.append((i, piece))
-
-        self.white_total = len(self.white_pieces)
-        self.black_total = len(self.black_pieces)
 
     def delete_redo_list(self):
         del self.redo_list[:]

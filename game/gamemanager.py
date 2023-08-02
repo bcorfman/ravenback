@@ -1,17 +1,19 @@
 import os
-from tkinter import Label, SUNKEN, NW
+from datetime import datetime
+from tkinter import NW, SUNKEN, Label
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesnocancel, showerror, showinfo
-from datetime import datetime
-from game.checkers import Checkers
+
+from gui.alphabetacontroller import AlphaBetaController
 from gui.boardview import BoardView
 from gui.filelist import FileList
 from gui.playercontroller import PlayerController
-from gui.alphabetacontroller import AlphaBetaController
-from parsing.PDN import PDNReader, PDNWriter, board_to_PDN_ready
+
+from game.checkers import Checkers
 from parsing.migrate import RCF2PDN, build_move_annotation_pairs
-from util.globalconst import BLACK, WHITE, TITLE, VERSION, KING, MAN, PROGRAM_TITLE, TRAINING_DIR
-from util.globalconst import square_map, keymap
+from parsing.PDN import PDNReader, PDNWriter, board_to_PDN_ready
+from util.globalconst import (BLACK, KING, MAN, PROGRAM_TITLE, TITLE,
+                              TRAINING_DIR, VERSION, WHITE, keymap, square_map)
 
 
 class GameManager(object):
@@ -132,7 +134,6 @@ class GameManager(object):
                     squares[square_map[i]] = WHITE | KING
                 self.model.curr_state.reset_undo()
                 self.model.curr_state.redo_list = game.moves
-                self.model.curr_state.update_piece_count()
                 self.view.reset_view(self.model)
                 self.view.serializer.restore(game.description)
                 self.view.curr_annotation = self.view.get_annotation()
@@ -211,20 +212,7 @@ class GameManager(object):
                 undo_steps += 1
                 self.model.curr_state.undo_move(None, True, True, self.view.get_annotation())
             # save the state of the board
-            to_move = 'black' if self.model.curr_state.to_move == BLACK else 'white'
-            black_men = []
-            black_kings = []
-            white_men = []
-            white_kings = []
-            for i, sq in enumerate(self.model.curr_state.squares):
-                if sq == BLACK | MAN:
-                    black_men.append(keymap[i])
-                elif sq == BLACK | KING:
-                    black_kings.append(keymap[i])
-                elif sq == WHITE | MAN:
-                    white_men.append(keymap[i])
-                elif sq == WHITE | KING:
-                    white_kings.append(keymap[i])
+            to_move, black_men, black_kings, white_men, white_kings = self.model.curr_state.save_board_state()
             # change description into line comments
             description = self.view.serializer.dump()
             description = '% ' + description

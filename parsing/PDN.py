@@ -1,14 +1,18 @@
-import charset_normalizer
 import copy
 import os
 import textwrap
 from io import StringIO
-from pyparsing import Combine, Forward, Group, LineStart, LineEnd, Literal, OneOrMore, Optional, \
-    QuotedString, Suppress, Word, WordEnd, WordStart, nums, one_of, rest_of_line, srange
 from typing import NamedTuple
+
+import charset_normalizer
+from pyparsing import (Combine, Forward, Group, LineEnd, LineStart, Literal,
+                       OneOrMore, Optional, QuotedString, Suppress, Word,
+                       WordEnd, WordStart, nums, one_of, rest_of_line, srange)
+
 from base.move import Move
 from game.checkers import Checkers
-from util.globalconst import keymap, square_map, BLACK, WHITE, MAN, KING, HEADER, DESC, BODY
+from util.globalconst import (BLACK, BODY, DESC, HEADER, KING, MAN, WHITE,
+                              keymap, square_map)
 
 
 def is_game_terminator(item):
@@ -393,20 +397,20 @@ def translate_to_fen(next_to_move, black_men, white_men, black_kings, white_king
     if white_men or white_kings:
         fen += "W"
         if white_men:
-            fen += ",".join([str(n) for n in white_men])
+            fen += ",".join([str(n) for n in sorted(white_men)])
         if white_kings:
             if white_men:
                 fen += ','
-            fen += ",".join([f"K{n}" for n in white_kings])
+            fen += ",".join([f"K{n}" for n in sorted(white_kings)])
         fen += ":"
     if black_men or black_kings:
         fen += "B"
         if black_men:
-            fen += ",".join([str(n) for n in black_men])
+            fen += ",".join([str(n) for n in sorted(black_men)])
         if black_kings:
             if black_men:
                 fen += ','
-            fen += ",".join([f"K{n}" for n in black_kings])
+            fen += ",".join([f"K{n}" for n in sorted(black_kings)])
     return fen
 
 
