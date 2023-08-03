@@ -2,11 +2,13 @@ import time
 
 import ai.games as games
 from base.move import Move
-from util.globalconst import (
-    BLACK, BLACK_CHAR, BLACK_IDX, BLACK_KING, BRV, COLORS, CRAMP, ENDGAME,
-    FREE, FREE_CHAR, INTACT_DOUBLE_CORNER, KCV, KEV, KING, KING_IDX, MAN, MCV,
-    MEV, MIDGAME, OCCUPIED, OCCUPIED_CHAR, OPENING, TURN, TYPES, WHITE,
-    WHITE_CHAR, WHITE_IDX, WHITE_KING, create_grid_map, square_map, keymap)
+from util.globalconst import (BLACK, BLACK_CHAR, BLACK_IDX, BLACK_KING, BRV,
+                              COLORS, CRAMP, ENDGAME, FREE, FREE_CHAR,
+                              INTACT_DOUBLE_CORNER, KCV, KEV, KING, KING_IDX,
+                              MAN, MCV, MEV, MIDGAME, OCCUPIED, OCCUPIED_CHAR,
+                              OPENING, TURN, TYPES, WHITE, WHITE_CHAR,
+                              WHITE_IDX, WHITE_KING, create_grid_map, keymap,
+                              square_map)
 
 
 class Checkerboard(object):
@@ -164,6 +166,10 @@ class Checkerboard(object):
                 white_men.append(keymap[i])
             elif sq == WHITE | KING:
                 white_kings.append(keymap[i])
+        black_men.sort()
+        black_kings.sort()
+        white_men.sort()
+        white_kings.sort()
         return to_move, black_men, black_kings, white_men, white_kings
 
     def has_opposition(self, color):

@@ -12,8 +12,8 @@ from gui.playercontroller import PlayerController
 from game.checkers import Checkers
 from parsing.migrate import RCF2PDN, build_move_annotation_pairs
 from parsing.PDN import PDNReader, PDNWriter, board_to_PDN_ready
-from util.globalconst import (BLACK, KING, MAN, PROGRAM_TITLE, TITLE,
-                              TRAINING_DIR, VERSION, WHITE, square_map)
+from util.globalconst import (BLACK, PROGRAM_TITLE, TITLE, TRAINING_DIR,
+                              VERSION, WHITE)
 
 
 class GameManager(object):

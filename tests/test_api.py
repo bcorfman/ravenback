@@ -89,4 +89,4 @@ def test_create_session():
                   '[Site ""]\n' + \
                   '[Result ""]\n' + \
                   '[BoardOrientation "white_on_top"]\n'
-    assert json['move'] == 1
+

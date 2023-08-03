@@ -263,7 +263,7 @@ class PDNReader:
             if game.description and not (processed & DESC):
                 self._description = game.description.as_list().pop()
                 processed += DESC
-            if game.body and not (processed & BODY):
+            if not (processed & BODY):
                 self._set_board_defaults_if_needed()
                 for item in game.body:
                     if len(item) > 1:

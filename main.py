@@ -29,13 +29,11 @@ async def create_session():
         "pdn":
         PDNWriter.to_string('', '', '', '', '', '', next_to_move, black_men,
                             white_men, black_kings, white_kings, '',
-                            'white_on_top', []),
-        "move":
-        1
+                            'white_on_top', [])
     }
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base("raven_db")
-    d = db.put(pdn, starlette_config.get('DETA_PROJECT_ID'))
+    d = db.put(pdn, "session")
     return JSONResponse(d)
 
 
@@ -119,14 +117,8 @@ async def legal_moves(
 async def get_checkerboard_state():
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base("raven_db")
-    result = db.get(starlette_config.get('DETA_PROJECT_ID'))
-    latest_move = 0
-    pdn = ''
-    for item in result:
-        if item['move'] > latest_move:
-            latest_move = item['move']
-            pdn = item['pdn']
-    reader = PDNReader.from_string(pdn)
+    result = db.get("session")
+    reader = PDNReader.from_string(result['pdn'])
     game_params = reader.read_game(0)
     board = Checkers()
     state = board.curr_state
