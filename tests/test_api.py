@@ -65,6 +65,9 @@ def test_checker_values_out_of_range():
 
 def test_checkerboard_state_at_start():
     client = TestClient(app)
+    response = client.post('/end_session/')
+    response = client.post('/create_session/')
+    assert response.status_code == 200
     response = client.get('/cb_state/')
     assert response.status_code == 200
     assert response.json() == {
@@ -90,3 +93,12 @@ def test_create_session():
                   '[Result ""]\n' + \
                   '[BoardOrientation "white_on_top"]\n'
 
+
+def test_end_session():
+    client = TestClient(app)
+    response = client.post('/end_session/')
+    assert response.status_code == 200
+    # now try to get the checkerboard state, which shouldn't be able to
+    # be found in the database any longer.
+    response = client.get('/cb_state/')
+    assert response.status_code == 404

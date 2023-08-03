@@ -37,6 +37,13 @@ async def create_session():
     return JSONResponse(d)
 
 
+@app.post("/end_session/")
+async def end_session():
+    deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
+    db = deta.Base("raven_db")
+    db.delete("session")
+
+
 # example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
 @app.get("/legal_moves/")
 async def legal_moves(
@@ -118,6 +125,8 @@ async def get_checkerboard_state():
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base("raven_db")
     result = db.get("session")
+    if not result:
+        return JSONResponse(status_code=404, content={"message": "Session not found."})
     reader = PDNReader.from_string(result['pdn'])
     game_params = reader.read_game(0)
     board = Checkers()
