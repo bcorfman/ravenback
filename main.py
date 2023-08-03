@@ -40,8 +40,8 @@ async def create_session():
 @app.post("/end_session/")
 async def end_session():
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
-    db = deta.Base("raven_db")
-    db.delete("session")
+    db = deta.Base('raven_db')
+    db.delete('session')
 
 
 # example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
@@ -123,10 +123,11 @@ async def legal_moves(
 @app.get("/cb_state/")
 async def get_checkerboard_state():
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
-    db = deta.Base("raven_db")
-    result = db.get("session")
+    db = deta.Base('raven_db')
+    result = db.get('session')
     if not result:
-        return JSONResponse(status_code=404, content={"message": "Session not found."})
+        return JSONResponse(status_code=404,
+                            content={'message': 'Session not found.'})
     reader = PDNReader.from_string(result['pdn'])
     game_params = reader.read_game(0)
     board = Checkers()
@@ -136,9 +137,50 @@ async def get_checkerboard_state():
     )
 
     return JSONResponse({
-        "to_move": next_to_move,
-        "black_men": black_men,
-        "black_kings": black_kings,
-        "white_men": white_men,
-        "white_kings": white_kings
+        'to_move': next_to_move,
+        'black_men': black_men,
+        'black_kings': black_kings,
+        'white_men': white_men,
+        'white_kings': white_kings
     })
+
+
+@app.get("/make_move/")
+async def make_move(
+    start_square: Annotated[
+        int,
+        Query(title="Starting square for move",
+              description="Checker location where the move starts from")],
+    end_square: Annotated[
+        int,
+        Query(title="Ending square for move",
+              description="Checker location where the move ends")]):
+    deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
+    db = deta.Base('raven_db')
+    result = db.get('session')
+    if not result:
+        return JSONResponse(status_code=404,
+                            content={'message': 'Session not found.'})
+    # restore game from session
+    reader = PDNReader.from_string(result['pdn'])
+    game_params = reader.read_game(0)
+    board = Checkers()
+    state = board.curr_state
+    state.setup_game(game_params)
+    # make the move (if it's valid), then save the session.
+    for move in board.legal_moves():
+        move_start = move.affected_squares[0][0]
+        move_end = move.affected_squares[:-1][0]
+        if start_square == move_start and end_square == move_end:
+            state.make_move(start_square, end_square)
+            break
+    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
+    )
+    pdn = {
+        "pdn":
+        PDNWriter.to_string('', '', '', '', '', '', next_to_move, black_men,
+                            white_men, black_kings, white_kings, '',
+                            'white_on_top', [])
+    }
+    d = db.put(pdn, "session")
+    return JSONResponse(d)

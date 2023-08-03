@@ -102,3 +102,10 @@ def test_end_session():
     # be found in the database any longer.
     response = client.get('/cb_state/')
     assert response.status_code == 404
+
+
+def test_make_move():
+    client = TestClient(app)
+    response = client.post('/end_session/')
+    response = client.post('/create_session/')
+    assert response.status_code == 200
