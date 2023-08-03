@@ -65,6 +65,9 @@ def test_checker_values_out_of_range():
 
 def test_checkerboard_state_at_start():
     client = TestClient(app)
+    response = client.post('/end_session/')
+    response = client.post('/create_session/')
+    assert response.status_code == 200
     response = client.get('/cb_state/')
     assert response.status_code == 200
     assert response.json() == {
