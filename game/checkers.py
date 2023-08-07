@@ -578,7 +578,7 @@ class Checkers(games.Game):
                   annotation=''):
         state = curr_state or self.curr_state
         return state.make_move(move, notify, undo, annotation)
-    
+
     def undo_move(self,
                   move=None,
                   curr_state=None,
