@@ -168,12 +168,17 @@ async def make_move(
     state = board.curr_state
     state.setup_game(game_params)
     # make the move (if it's valid), then save the session.
-    for move in board.legal_moves():
+    legal_moves = state.captures or state.moves
+    found_move = False
+    for move in legal_moves:
         move_start = move.affected_squares[0][0]
         move_end = move.affected_squares[:-1][0]
         if start_square == move_start and end_square == move_end:
-            state.make_move(start_square, end_square)
-            break
+            state.make_move(move, False, False)
+            found_move = True
+    if not found_move:
+        return JSONResponse(status_code=404, content={'message': 'Move not made.'})
+
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
     )
     pdn = {

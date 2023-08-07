@@ -188,16 +188,19 @@ class Checkerboard(object):
     def delete_redo_list(self):
         del self.redo_list[:]
 
-    def make_move(self, start_square, end_square, notify=True, undo=True, annotation=''):
-        legal_moves = self.captures or self.moves
+    def make_move(self, move, notify=True, undo=True, annotation=''):
         sq = self.squares
-        for move in legal_moves:
-            move_start = move.affected_squares[0][0]
-            move_end = move.affected_squares[:-1][0]
-            if start_square == move_start and end_square == move_end:
-                for idx, _, new_value in move.affected_squares:
-                    sq[idx] = new_value
-                self.to_move ^= COLORS
+        for idx, _, new_value in move.affected_squares:
+            sq[idx] = new_value
+        self.to_move ^= COLORS
+
+        if notify:
+            self.update_piece_count()
+            for o in self.observers:
+                o.notify(move)
+        if undo:
+            move.annotation = annotation
+            self.undo_list.append(move)
         return self
 
     def undo_move(self, move=None, notify=True, redo=True, annotation=''):
@@ -568,15 +571,14 @@ class Checkers(games.Game):
         return state.captures or state.moves
 
     def make_move(self,
-                  start_square,
-                  end_square,
+                  move,
                   curr_state=None,
                   notify=True,
                   undo=True,
                   annotation=''):
         state = curr_state or self.curr_state
-        return state.make_move(start_square, end_square, notify, undo, annotation)
-
+        return state.make_move(move, notify, undo, annotation)
+    
     def undo_move(self,
                   move=None,
                   curr_state=None,
