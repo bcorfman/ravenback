@@ -145,13 +145,13 @@ async def get_checkerboard_state():
     })
 
 
-@app.get("/make_move/")
+@app.post("/make_move/")
 async def make_move(
-    start_square: Annotated[
+    start_sq: Annotated[
         int,
         Query(title="Starting square for move",
               description="Checker location where the move starts from")],
-    end_square: Annotated[
+    end_sq: Annotated[
         int,
         Query(title="Ending square for move",
               description="Checker location where the move ends")]):
@@ -172,8 +172,8 @@ async def make_move(
     found_move = False
     for move in legal_moves:
         move_start = move.affected_squares[0][0]
-        move_end = move.affected_squares[:-1][0]
-        if start_square == move_start and end_square == move_end:
+        move_end = move.affected_squares[-1][0]
+        if start_sq == move_start and end_sq == move_end:
             state.make_move(move, False, False)
             found_move = True
     if not found_move:
