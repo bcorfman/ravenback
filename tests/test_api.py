@@ -79,7 +79,7 @@ def test_checkerboard_state_at_start():
     }
 
 
-""" def test_checkerboard_state_after_initial_move_from_single_corner():
+def test_checkerboard_state_after_initial_move_from_single_corner():
     client = TestClient(app)
     response = client.post('/end_session/')
     response = client.post('/create_session/')
@@ -95,7 +95,7 @@ def test_checkerboard_state_at_start():
         "white_men": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
         "white_kings": []
     }
- """
+
 
 
 def test_create_session():
