@@ -97,7 +97,6 @@ def test_checkerboard_state_after_initial_move_from_single_corner():
     }
 
 
-
 def test_create_session():
     client = TestClient(app)
     response = client.post('/create_session/')
