@@ -176,8 +176,10 @@ async def make_move(
         if start_sq == keymap[move_start] and end_sq == keymap[move_end]:
             state.make_move(move, False, False)
             found_move = True
+            break
     if not found_move:
-        return JSONResponse(status_code=404, content={'message': 'Move not made.'})
+        return JSONResponse(status_code=404, content={'message':
+                                                      'Illegal move. Check squares, along with player turn.'})
 
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
     )
