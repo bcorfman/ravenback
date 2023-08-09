@@ -173,7 +173,7 @@ async def make_move(
     for move in legal_moves:
         move_start = move.affected_squares[0][0]
         move_end = move.affected_squares[-1][0]
-        if start_sq == move_start and end_sq == move_end:
+        if start_sq == keymap[move_start] and end_sq == keymap[move_end]:
             state.make_move(move, False, False)
             found_move = True
     if not found_move:

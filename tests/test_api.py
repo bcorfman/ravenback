@@ -89,7 +89,7 @@ def test_checkerboard_state_after_initial_move_from_single_corner():
     response = client.get('/cb_state/')
     assert response.status_code == 200
     assert response.json() == {
-        "to_move": "black",
+        "to_move": "white",
         "black_men": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15],
         "black_kings": [],
         "white_men": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
