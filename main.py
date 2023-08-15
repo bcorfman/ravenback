@@ -191,3 +191,38 @@ async def make_move(
     }
     d = db.put(pdn, "session")
     return JSONResponse(d)
+
+
+@app.get("/calc_move/")
+async def calc_move(
+    search_time: Annotated[
+        int,
+        Query(title="Search time for AI (seconds)",
+              description="Max search time (approximate) for AI to calculate its next move")]):
+    deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
+    db = deta.Base('raven_db')
+    result = db.get('session')
+    if not result:
+        return JSONResponse(status_code=404,
+                            content={'message': 'Session not found.'})
+    # restore game from session
+    reader = PDNReader.from_string(result['pdn'])
+    game_params = reader.read_game(0)
+    board = Checkers()
+    state = board.curr_state
+    state.setup_game(game_params)
+    move = board.calc_move(state, search_time)
+    if not move:
+        return JSONResponse(status_code=404, content={'message':
+                                                      'Could not find move within search time.'})
+    state.make_move(move, False, False)
+    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
+    )
+    pdn = {
+        "pdn":
+        PDNWriter.to_string('', '', '', '', '', '', next_to_move, black_men,
+                            white_men, black_kings, white_kings, '',
+                            'white_on_top', [])
+    }
+    d = db.put(pdn, "session")
+    return JSONResponse(d)

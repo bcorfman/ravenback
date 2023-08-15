@@ -1,3 +1,4 @@
+import copy
 import time
 
 import ai.games as games
@@ -5,10 +6,10 @@ from base.move import Move
 from util.globalconst import (BLACK, BLACK_CHAR, BLACK_IDX, BLACK_KING, BRV,
                               COLORS, CRAMP, ENDGAME, FREE, FREE_CHAR,
                               INTACT_DOUBLE_CORNER, KCV, KEV, KING, KING_IDX,
-                              MAN, MCV, MEV, MIDGAME, OCCUPIED, OCCUPIED_CHAR,
-                              OPENING, TURN, TYPES, WHITE, WHITE_CHAR,
-                              WHITE_IDX, WHITE_KING, create_grid_map, keymap,
-                              square_map)
+                              MAN, MAX_DEPTH, MCV, MEV, MIDGAME, OCCUPIED,
+                              OCCUPIED_CHAR, OPENING, TURN, TYPES, WHITE,
+                              WHITE_CHAR, WHITE_IDX, WHITE_KING,
+                              create_grid_map, keymap, square_map)
 
 
 class Checkerboard(object):
@@ -641,6 +642,36 @@ class Checkers(games.Game):
             nodes += self.perft(depth - 1, state)
             state.undo_move(move, False, False)
         return nodes
+
+    def longest_of(self, moves):
+        length = -1
+        selected = None
+        for move in moves:
+            current_length = len(move.affected_squares)
+            if current_length > length:
+                length = current_length
+                selected = move
+        return selected
+
+    def calc_move(self, model, search_time):
+        captures = model.captures_available()
+        if captures:
+            move = self.longest_of(captures)
+        else:
+            depth = 0
+            start_time = time.time()
+            curr_time = start_time
+            model_copy = copy.deepcopy(model)
+            while 1:
+                depth += 1
+                move = games.alphabeta_search(model_copy.curr_state, model_copy, depth)
+                checkpoint = curr_time
+                curr_time = time.time()
+                rem_time = search_time - (curr_time - checkpoint)
+                if (curr_time - start_time > search_time or ((curr_time - checkpoint) * 2) > rem_time or
+                        depth > MAX_DEPTH):
+                    break
+        return move
 
 
 def play():
