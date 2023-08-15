@@ -82,7 +82,7 @@ def alphabeta_search(state, game, d=4, cutoff_test=None, eval_fn=None):
         v = -infinity
         successor = game.successors(st)
         for (a, s) in successor:
-            v = max(v, min_value(s, alpha, beta, depth+1))
+            v = max(v, min_value(s, alpha, beta, depth + 1))
             if v >= beta:
                 successor.close()
                 return v
@@ -95,7 +95,7 @@ def alphabeta_search(state, game, d=4, cutoff_test=None, eval_fn=None):
         v = infinity
         successor = game.successors(st)
         for (a, s) in successor:
-            v = min(v, max_value(s, alpha, beta, depth+1))
+            v = min(v, max_value(s, alpha, beta, depth + 1))
             if v <= alpha:
                 successor.close()
                 return v
@@ -104,11 +104,12 @@ def alphabeta_search(state, game, d=4, cutoff_test=None, eval_fn=None):
 
     # Body of alphabeta_search starts here:
     # The default test cuts off at depth d or at a terminal st
-    cutoff_test = (cutoff_test or
-                   (lambda st, depth: depth > d or game.terminal_test(st)))
+    cutoff_test = (cutoff_test
+                   or (lambda st, depth: depth > d or game.terminal_test(st)))
     eval_fn = eval_fn or (lambda st: game.utility(player, st))
-    action, state = argmax_random_tie(game.successors(state),
-                                      lambda a_s: min_value(a_s[1], -infinity, infinity, 0))
+    action, state = argmax(
+        game.successors(state),
+        lambda a_s: min_value(a_s[1], -infinity, infinity, 0))
     return action
 
 
@@ -197,10 +198,12 @@ class Fig62Game(Game):
     'a1'
     """
 
-    succs = {'A': [('a1', 'B'), ('a2', 'C'), ('a3', 'D')],
-             'B': [('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')],
-             'C': [('c1', 'C1'), ('c2', 'C2'), ('c3', 'C3')],
-             'D': [('d1', 'D1'), ('d2', 'D2'), ('d3', 'D3')]}
+    succs = {
+        'A': [('a1', 'B'), ('a2', 'C'), ('a3', 'D')],
+        'B': [('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')],
+        'C': [('c1', 'C1'), ('c2', 'C2'), ('c3', 'C3')],
+        'D': [('d1', 'D1'), ('d2', 'D2'), ('d3', 'D3')]
+    }
     utils = Dict(B1=3, B2=12, B3=8, C1=2, C2=4, C3=6, D1=14, D2=5, D3=2)
     initial = 'A'
 
@@ -228,11 +231,11 @@ class TicTacToe(Game):
     A st has the player to move, a cached utility, a list of moves in
     the form of a list of (x, y) positions, and a board, in the form of
     a dct of {(x, y): Player} entries, where Player is 'X' or 'O'."""
+
     def __init__(self, h=3, v=3, k=3):
         Game.__init__(self)
         update(self, h=h, v=v, k=k)
-        moves = [(x, y) for x in range(1, h+1)
-                 for y in range(1, v+1)]
+        moves = [(x, y) for x in range(1, h + 1) for y in range(1, v + 1)]
         self.initial = Struct(to_move='X', utility=0, board={}, moves=moves)
 
     def legal_moves(self, state):
@@ -248,7 +251,8 @@ class TicTacToe(Game):
         moves.remove(move)
         return Struct(to_move=if_(state.to_move == 'X', 'O', 'X'),
                       utility=self.compute_utility(board, move, state.to_move),
-                      board=board, moves=moves)
+                      board=board,
+                      moves=moves)
 
     def utility(self, state, player):
         """Return the value to X; 1 for win, -1 for loss, 0 otherwise."""
@@ -260,17 +264,17 @@ class TicTacToe(Game):
 
     def display(self, state):
         board = state.board
-        for x in range(1, self.h+1):
-            for y in range(1, self.v+1):
-                print(board.get((x, y), '.'),)
+        for x in range(1, self.h + 1):
+            for y in range(1, self.v + 1):
+                print(board.get((x, y), '.'), )
             print
 
     def compute_utility(self, board, move, player):
         """If X wins with this move, return 1; if O return -1; else return 0."""
-        if (self.k_in_row(board, move, player, (0, 1)) or
-                self.k_in_row(board, move, player, (1, 0)) or
-                self.k_in_row(board, move, player, (1, -1)) or
-                self.k_in_row(board, move, player, (1, 1))):
+        if (self.k_in_row(board, move, player,
+                          (0, 1)) or self.k_in_row(board, move, player, (1, 0))
+                or self.k_in_row(board, move, player, (1, -1))
+                or self.k_in_row(board, move, player, (1, 1))):
             return if_(player == 'X', +1, -1)
         else:
             return 0
@@ -302,4 +306,4 @@ class ConnectFour(TicTacToe):
     def legal_moves(self, state):
         """Legal moves are any square not yet taken."""
         return [(x, y) for (x, y) in state.moves
-                if y == 0 or (x, y-1) in state.board]
+                if y == 0 or (x, y - 1) in state.board]

@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
 
-from game.checkers import Checkers
+from game.checkers import Checkers, calc_ai_move
 from parsing.PDN import PDNReader, PDNWriter
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
@@ -217,7 +217,7 @@ async def calc_move(search_time: Annotated[
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
-    move = board.calc_move(state, search_time)
+    move = calc_ai_move(board, search_time)
     if not move:
         return JSONResponse(
             status_code=404,
@@ -231,5 +231,8 @@ async def calc_move(search_time: Annotated[
                             white_men, black_kings, white_kings, '',
                             'white_on_top', [])
     }
-    d = db.put(pdn, "session")
-    return JSONResponse(d)
+    db.put(pdn, "session")
+    move_start = move.affected_squares[0][0]
+    move_end = move.affected_squares[-1][0]
+    move_dict = {"start_sq": keymap[move_start], "end_sq": keymap[move_end]}
+    return JSONResponse(move_dict)

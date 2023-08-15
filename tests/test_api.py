@@ -118,12 +118,12 @@ def test_calc_move():
     response = client.post('/end_session/')
     response = client.post('/create_session/')
     assert response.status_code == 200
-    #response = client.post('/calc_move/?search_time=5')
-    #assert response.status_code == 200
-    #assert response.json() == {
-    #    "start_sq": 11,
-    #    "end_sq": 15,
-    #}
+    response = client.post('/calc_move/?search_time=5')
+    assert response.status_code == 200
+    assert response.json() == {
+        "start_sq": 10,
+        "end_sq": 15,
+    }
 
 
 def test_create_session():
