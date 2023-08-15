@@ -193,7 +193,7 @@ async def make_move(
     return JSONResponse(d)
 
 
-@app.get("/calc_move/")
+@app.post("/calc_move/")
 async def calc_move(
     search_time: Annotated[
         int,
