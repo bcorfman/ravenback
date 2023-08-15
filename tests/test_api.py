@@ -113,6 +113,19 @@ def test_checkerboard_state_after_double_jump_to_crown():
     }
 
 
+def test_calc_move():
+    client = TestClient(app)
+    response = client.post('/end_session/')
+    response = client.post('/create_session/')
+    assert response.status_code == 200
+    #response = client.post('/calc_move/?search_time=5')
+    #assert response.status_code == 200
+    #assert response.json() == {
+    #    "start_sq": 11,
+    #    "end_sq": 15,
+    #}
+
+
 def test_create_session():
     client = TestClient(app)
     response = client.post('/create_session/')

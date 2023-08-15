@@ -44,7 +44,7 @@ async def end_session():
     db.delete('session')
 
 
-# example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29")
+# example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29"
 @app.get("/legal_moves/")
 async def legal_moves(
     to_move: Annotated[
@@ -145,6 +145,7 @@ async def get_checkerboard_state():
     })
 
 
+# example - https://raven-1-j8079958.deta.app/make_move/?start_sq=11&end_sq=15"
 @app.post("/make_move/")
 async def make_move(
     start_sq: Annotated[
@@ -178,8 +179,12 @@ async def make_move(
             found_move = True
             break
     if not found_move:
-        return JSONResponse(status_code=404, content={'message':
-                                                      'Illegal move. Check squares, along with player turn.'})
+        return JSONResponse(
+            status_code=404,
+            content={
+                'message':
+                'Illegal move. Check squares, along with player turn.'
+            })
 
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
     )
@@ -193,12 +198,13 @@ async def make_move(
     return JSONResponse(d)
 
 
+# example - https://raven-1-j8079958.deta.app/calc_move/?search_time=5"
 @app.post("/calc_move/")
-async def calc_move(
-    search_time: Annotated[
-        int,
-        Query(title="Search time for AI (seconds)",
-              description="Max search time (approximate) for AI to calculate its next move")]):
+async def calc_move(search_time: Annotated[
+    int,
+    Query(title="Search time for AI (seconds)",
+          description=
+          "Max search time (approximate) for AI to calculate its next move")]):
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base('raven_db')
     result = db.get('session')
@@ -213,8 +219,9 @@ async def calc_move(
     state.setup_game(game_params)
     move = board.calc_move(state, search_time)
     if not move:
-        return JSONResponse(status_code=404, content={'message':
-                                                      'Could not find move within search time.'})
+        return JSONResponse(
+            status_code=404,
+            content={'message': 'Could not find move within search time.'})
     state.make_move(move, False, False)
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
     )
