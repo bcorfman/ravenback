@@ -643,35 +643,26 @@ class Checkers(games.Game):
             state.undo_move(move, False, False)
         return nodes
 
-    def longest_of(self, moves):
-        length = -1
-        selected = None
-        for move in moves:
-            current_length = len(move.affected_squares)
-            if current_length > length:
-                length = current_length
-                selected = move
-        return selected
 
-    def calc_move(self, model, search_time):
-        captures = model.captures_available()
-        if captures:
-            move = self.longest_of(captures)
-        else:
-            depth = 0
-            start_time = time.time()
-            curr_time = start_time
-            model_copy = copy.deepcopy(model)
-            while 1:
-                depth += 1
-                move = games.alphabeta_search(model_copy.curr_state, model_copy, depth)
-                checkpoint = curr_time
-                curr_time = time.time()
-                rem_time = search_time - (curr_time - checkpoint)
-                if (curr_time - start_time > search_time or ((curr_time - checkpoint) * 2) > rem_time or
-                        depth > MAX_DEPTH):
-                    break
-        return move
+def longest_of(moves):
+    length = -1
+    selected = None
+    for move in moves:
+        current_length = len(move.affected_squares)
+        if current_length > length:
+            length = current_length
+            selected = move
+    return selected
+
+
+def calc_ai_move(model, search_time):
+    captures = model.captures_available()
+    if captures:
+        move = longest_of(captures)
+    else:
+        model_copy = copy.deepcopy(model)
+        move = games.alphabeta_search(model_copy.curr_state, model_copy, 6)
+    return move
 
 
 def play():

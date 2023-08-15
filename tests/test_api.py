@@ -79,21 +79,50 @@ def test_checkerboard_state_at_start():
     }
 
 
-def test_checkerboard_state_after_initial_move_from_single_corner():
+def test_checkerboard_state_after_double_jump_to_crown():
     client = TestClient(app)
     response = client.post('/end_session/')
     response = client.post('/create_session/')
     assert response.status_code == 200
     response = client.post('/make_move/?start_sq=11&end_sq=15')
     assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=24&end_sq=20')
+    assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=8&end_sq=11')
+    assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=28&end_sq=24')
+    assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=10&end_sq=14')
+    assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=32&end_sq=28')
+    assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=4&end_sq=8')
+    assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=23&end_sq=18')
+    assert response.status_code == 200
+    response = client.post('/make_move/?start_sq=14&end_sq=32')
+    assert response.status_code == 200
     response = client.get('/cb_state/')
     assert response.status_code == 200
     assert response.json() == {
         "to_move": "white",
-        "black_men": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15],
-        "black_kings": [],
-        "white_men": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+        "black_men": [1, 2, 3, 5, 6, 7, 8, 9, 11, 12, 15],
+        "black_kings": [32],
+        "white_men": [20, 21, 22, 24, 25, 26, 28, 29, 30, 31],
         "white_kings": []
+    }
+
+
+def test_calc_move():
+    client = TestClient(app)
+    response = client.post('/end_session/')
+    response = client.post('/create_session/')
+    assert response.status_code == 200
+    response = client.post('/calc_move/?search_time=5')
+    assert response.status_code == 200
+    assert response.json() == {
+        "start_sq": 10,
+        "end_sq": 15,
     }
 
 
