@@ -150,3 +150,6 @@ pat.txt
 
 .space
 env.txt
+
+# pyenv 
+.python-version
