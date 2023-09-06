@@ -1,11 +1,11 @@
 {
     "hostRequirements": {
-        "cpus": 4,
+        "cpus": 2,
         "memory": "8gb",
         "storage": "32gb"
     },
-    "name": "Python 3.9",
-    "image": "mcr.microsoft.com/devcontainers/python:3.9",
+    "name": "Python 3.10",
+    "image": "mcr.microsoft.com/devcontainers/python:3.10",
     "features": {
         "ghcr.io/devcontainers-contrib/features/pipenv:2.0.9": {}
     },
