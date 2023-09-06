@@ -141,6 +141,26 @@ def test_create_session():
                   '[BoardOrientation "white_on_top"]\n'
 
 
+def test_create_session_with_pdn():
+    client = TestClient(app)
+    response = client.post(
+        '/create_session/?PDN=[Event "Captive Cossacks - SOIC p.83, Diagram 57"]\n[Date ""]\n' +
+        '[Black "Player1"]\n[White "Player2"]\nSite[""]\n' +
+        '[Result ""]\n[BoardOrientation "white_on_top"]\n' +
+        '[FEN "W:WK18,K19,K20:BK27,K28"]\n')
+    assert response.status_code == 200
+    json = response.json()
+    assert json[
+        'pdn'] == '[Event "Captive Cossacks - SOIC p.83, Diagram 57"]\n' + \
+                  '[Date ""]\n' + \
+                  '[Black "Player1"]\n' + \
+                  '[White "Player2"]\n' + \
+                  '[Site ""]\n' + \
+                  '[Result ""]\n' + \
+                  '[BoardOrientation "white_on_top"]\n' + \
+                  '[FEN "W:W26,K27:B17,K30"]'
+
+
 def test_end_session():
     client = TestClient(app)
     response = client.post('/end_session/')

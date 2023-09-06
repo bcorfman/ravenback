@@ -20,18 +20,30 @@ app.add_middleware(SessionMiddleware,
 
 
 @app.post("/create_session/")
-async def create_session():
+async def create_session(
+    pdn: Annotated[str | None,
+                   Query(title="String in Portable Draughts Notation (PDN)",
+                         description="If string is None, then default is starting game position.")] = None
+):
     board = Checkers()
     state = board.curr_state
+    if pdn is not None:
+        try:
+            reader = PDNReader.from_string(pdn)
+            game_params = reader.read_game(0)
+            state.setup_game(game_params)
+        except RuntimeError:
+            raise HTTPException(status_code=422,
+                                detail="Invalid PDN string")
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
     )
     pdn = {
         "pdn":
-        PDNWriter.to_string('', '', '', '', '', '', next_to_move, black_men,
-                            white_men, black_kings, white_kings, '',
-                            'white_on_top', [])
+        PDNWriter.to_string("", "", "", "", "", "", next_to_move, black_men,
+                            white_men, black_kings, white_kings, "",
+                            "white_on_top", [])
     }
-    deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
+    deta = Deta(starlette_config.get("DETA_SPACE_DATA_KEY"))
     db = deta.Base("raven_db")
     d = db.put(pdn, "session")
     return JSONResponse(d)
@@ -203,8 +215,7 @@ async def make_move(
 async def calc_move(search_time: Annotated[
     int,
     Query(title="Search time for AI (seconds)",
-          description=
-          "Max search time (approximate) for AI to calculate its next move")]):
+          description="Max search time (approximate) for AI to calculate its next move")]):
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base('raven_db')
     result = db.get('session')
