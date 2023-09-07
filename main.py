@@ -20,17 +20,18 @@ app.add_middleware(SessionMiddleware,
 
 
 @app.post("/create_session/")
-async def create_session(
-    pdn: Annotated[str | None,
-                   Query(title="String in Portable Draughts Notation (PDN)",
-                         description="If string is None, then default is starting game position.")] = None
-):
+async def create_session(fen: Annotated[
+    str | None,
+    Query(
+        title="String in Forsyth-Edwards Notation (FEN)",
+        description="If string is None, then default is starting game position, and black to move."
+        )] = None):
     board = Checkers()
     state = board.curr_state
-    if pdn is not None:
+    if fen is not None:
         try:
-            reader = PDNReader.from_string(pdn)
-            game_params = reader.read_game(0)
+            reader = PDNReader(None)
+            game_params = reader.game_params_from_fen(fen)
             state.setup_game(game_params)
         except RuntimeError:
             raise HTTPException(status_code=422,
@@ -141,7 +142,7 @@ async def get_checkerboard_state():
         return JSONResponse(status_code=404,
                             content={'message': 'Session not found.'})
     reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.read_game(0)
+    game_params = reader.game_params_from_pdn(0)
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
@@ -176,7 +177,7 @@ async def make_move(
                             content={'message': 'Session not found.'})
     # restore game from session
     reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.read_game(0)
+    game_params = reader.game_params_from_pdn(0)
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
@@ -224,7 +225,7 @@ async def calc_move(search_time: Annotated[
                             content={'message': 'Session not found.'})
     # restore game from session
     reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.read_game(0)
+    game_params = reader.game_params_from_pdn(0)
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)

@@ -6,10 +6,10 @@ from base.move import Move
 from util.globalconst import (BLACK, BLACK_CHAR, BLACK_IDX, BLACK_KING, BRV,
                               COLORS, CRAMP, ENDGAME, FREE, FREE_CHAR,
                               INTACT_DOUBLE_CORNER, KCV, KEV, KING, KING_IDX,
-                              MAN, MAX_DEPTH, MCV, MEV, MIDGAME, OCCUPIED,
-                              OCCUPIED_CHAR, OPENING, TURN, TYPES, WHITE,
-                              WHITE_CHAR, WHITE_IDX, WHITE_KING,
-                              create_grid_map, keymap, square_map)
+                              MAN, MCV, MEV, MIDGAME, OCCUPIED, OCCUPIED_CHAR,
+                              OPENING, TURN, TYPES, WHITE, WHITE_CHAR,
+                              WHITE_IDX, WHITE_KING, create_grid_map, keymap,
+                              square_map)
 
 
 class Checkerboard(object):

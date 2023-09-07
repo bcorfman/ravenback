@@ -1,7 +1,9 @@
 import os
+
 from base.move import Move
-from parsing.PDN import PDNReader, PDNWriter, translate_to_fen, board_to_PDN_ready
-from util.globalconst import BLACK, WHITE, MAN, KING, FREE, square_map
+from parsing.PDN import (PDNReader, PDNWriter, board_to_PDN_ready,
+                         translate_to_fen)
+from util.globalconst import BLACK, FREE, KING, MAN, WHITE, square_map
 
 
 def test_board_to_PDN_ready():
@@ -83,7 +85,7 @@ def test_parse_PDN_string_success():
                  '52. 31-26 11-7 53. 26-23 19-26 54. 30-23 7-3 55. \n' + \
                  '23-18 3-8 56. 18-15 1-0\n'
     reader = PDNReader.from_string(pdn_string)
-    game = reader.read_game(0)
+    game = reader.game_params_from_pdn(0)
     assert game.event == "Casual Game"
     assert game.date == "2019.11.26"
     assert game.white_player == "Jubai"
@@ -158,11 +160,11 @@ def test_parse_PDN_file_success():
         game_list = reader.get_game_list()
         assert len(game_list) == 22621
         assert game_list[5].name == "Edinburgh 1847, game 2: Anderson, A. vs. Wyllie, J."
-        game = reader.read_game(22620)
+        game = reader.game_params_from_pdn(22620)
         assert game.event == "German Open 2004"
-        game = reader.read_game(5)
+        game = reader.game_params_from_pdn(5)
         assert game.event == "Edinburgh 1847, game 2"
-        game = reader.read_game(0)
+        game = reader.game_params_from_pdn(0)
         assert game.event == "Manchester 1841"
 
 

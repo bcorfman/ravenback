@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from io import StringIO
+
 from parsing.migrate import RCF2PDN
 from parsing.PDN import PDNReader
 
@@ -93,7 +94,7 @@ def test_first_position_rcf2pdn_migration():
     with open(input_filename) as rcf:
         pdn = RCF2PDN.with_string(rcf)
         reader = PDNReader.from_string(pdn)
-        game = reader.read_game(0)
+        game = reader.game_params_from_pdn(0)
         assert game is not None
 
 
