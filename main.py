@@ -20,18 +20,31 @@ app.add_middleware(SessionMiddleware,
 
 
 @app.post("/create_session/")
-async def create_session():
+async def create_session(fen: Annotated[
+    str | None,
+    Query(
+        title="String in Forsyth-Edwards Notation (FEN)",
+        description="If string is None, then default is starting game position, and black to move."
+        )] = None):
     board = Checkers()
     state = board.curr_state
+    if fen is not None:
+        try:
+            reader = PDNReader(None)
+            game_params = reader.game_params_from_fen(fen)
+            state.setup_game(game_params)
+        except RuntimeError:
+            raise HTTPException(status_code=422,
+                                detail="Invalid PDN string")
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
     )
     pdn = {
         "pdn":
-        PDNWriter.to_string('', '', '', '', '', '', next_to_move, black_men,
-                            white_men, black_kings, white_kings, '',
-                            'white_on_top', [])
+        PDNWriter.to_string("", "", "", "", "", "", next_to_move, black_men,
+                            white_men, black_kings, white_kings, "",
+                            "white_on_top", [])
     }
-    deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
+    deta = Deta(starlette_config.get("DETA_SPACE_DATA_KEY"))
     db = deta.Base("raven_db")
     d = db.put(pdn, "session")
     return JSONResponse(d)
@@ -129,7 +142,7 @@ async def get_checkerboard_state():
         return JSONResponse(status_code=404,
                             content={'message': 'Session not found.'})
     reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.read_game(0)
+    game_params = reader.game_params_from_pdn(0)
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
@@ -164,7 +177,7 @@ async def make_move(
                             content={'message': 'Session not found.'})
     # restore game from session
     reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.read_game(0)
+    game_params = reader.game_params_from_pdn(0)
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
@@ -203,8 +216,7 @@ async def make_move(
 async def calc_move(search_time: Annotated[
     int,
     Query(title="Search time for AI (seconds)",
-          description=
-          "Max search time (approximate) for AI to calculate its next move")]):
+          description="Max search time (approximate) for AI to calculate its next move")]):
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base('raven_db')
     result = db.get('session')
@@ -213,7 +225,7 @@ async def calc_move(search_time: Annotated[
                             content={'message': 'Session not found.'})
     # restore game from session
     reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.read_game(0)
+    game_params = reader.game_params_from_pdn(0)
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)

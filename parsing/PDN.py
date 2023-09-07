@@ -117,8 +117,8 @@ class PDNReader:
         self._event_name = None
         self._black_name = None
         self._white_name = None
-        self._black_player = None
-        self._white_player = None
+        self._black_player = ""
+        self._white_player = ""
         self._next_to_move = None
         self._black_men = None
         self._white_men = None
@@ -233,7 +233,7 @@ class PDNReader:
                     break
         return self._game_titles
 
-    def read_game(self, idx):
+    def game_params_from_pdn(self, idx):
         # parse the game at the requested index
         parse_header = {"Event": self._read_event,
                         "Site": self._read_site,
@@ -285,7 +285,7 @@ class PDNReader:
                         self._moves.append([move_list, annotation])
                     else:
                         raise RuntimeError(f"Cannot interpret item {item} in game.body")
-            # if no game description was in the file, add a basic one so the user has something to guide them.
+        # if no game description was in the file, add a basic one so the user has something to guide them.
         if not self._description:
             if self._black_player and self._white_player:
                 self._description += f"{self._event}: {self._black_player} vs. {self._white_player}"
@@ -297,6 +297,20 @@ class PDNReader:
         return Game(self._event, self._site, self._date, self._round, self._black_player,
                     self._white_player, self._next_to_move, self._black_men, self._white_men,
                     self._black_kings, self._white_kings, self._result, self._flip_board,
+                    self._description, board_moves)
+
+    def game_params_from_fen(self, line: str):
+        self._reset_pdn_vars()
+        self._read_fen(line)
+        board_moves = self._PDN_to_board_ready(self._next_to_move,
+                                               self._black_men,
+                                               self._black_kings,
+                                               self._white_men,
+                                               self._white_kings, self._moves)
+        return Game(self._event, self._site, self._date, self._round,
+                    self._black_player, self._white_player, self._next_to_move,
+                    self._black_men, self._white_men, self._black_kings,
+                    self._white_kings, self._result, self._flip_board,
                     self._description, board_moves)
 
     def _get_player_to_move(self, turn):

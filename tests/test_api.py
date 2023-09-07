@@ -141,6 +141,25 @@ def test_create_session():
                   '[BoardOrientation "white_on_top"]\n'
 
 
+def test_create_session_with_fen():
+    client = TestClient(app)
+    # Captive Cossacks - Pask's SOIC p. 83, Diagram 57
+    response = client.post(
+        '/create_session/?fen=W:W26,K27:B17,K30')
+    assert response.status_code == 200
+    json = response.json()
+    assert json[
+        'pdn'] == '[Event ""]\n' + \
+                  '[Date ""]\n' + \
+                  '[Black ""]\n' + \
+                  '[White ""]\n' + \
+                  '[Site ""]\n' + \
+                  '[Result ""]\n' + \
+                  '[SetUp "1"]\n' + \
+                  '[FEN "W:W26,K27:B17,K30"]\n' + \
+                  '[BoardOrientation "white_on_top"]\n'
+
+
 def test_end_session():
     client = TestClient(app)
     response = client.post('/end_session/')

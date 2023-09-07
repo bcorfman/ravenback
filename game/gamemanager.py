@@ -125,9 +125,9 @@ class GameManager(object):
             if len(game_list) > 1:
                 dlg = FileList(self._root, game_list)
                 if dlg.result:
-                    game_params = reader.read_game(dlg.result)
+                    game_params = reader.game_params_from_pdn(dlg.result)
             else:
-                game_params = reader.read_game(0)
+                game_params = reader.game_params_from_pdn(0)
             if game_params is not None:
                 self.model.curr_state.setup_game(game_params)
                 self.view.reset_view(self.model)
