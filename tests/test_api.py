@@ -148,16 +148,7 @@ def test_create_session_with_fen():
         '/create_session/?fen=W:W26,K27:B17,K30')
     assert response.status_code == 200
     json = response.json()
-    assert json[
-        'pdn'] == '[Event ""]\n' + \
-                  '[Date ""]\n' + \
-                  '[Black ""]\n' + \
-                  '[White ""]\n' + \
-                  '[Site ""]\n' + \
-                  '[Result ""]\n' + \
-                  '[SetUp "1"]\n' + \
-                  '[FEN "W:W26,K27:B17,K30"]\n' + \
-                  '[BoardOrientation "white_on_top"]\n'
+    assert json['fen'] == 'W:W26,K27:B17,K30'
 
 
 def test_end_session():

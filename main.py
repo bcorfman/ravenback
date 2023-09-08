@@ -7,7 +7,7 @@ from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
 
 from game.checkers import Checkers, calc_ai_move
-from parsing.PDN import PDNReader, PDNWriter
+from parsing.PDN import PDNReader, PDNWriter, translate_to_fen
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
 starlette_config = Config('env.txt')
@@ -34,18 +34,15 @@ async def create_session(fen: Annotated[
             state.setup_game(game_params)
         except RuntimeError:
             raise HTTPException(status_code=422,
-                                detail="Invalid PDN string")
-    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
-    )
-    pdn = {
-        "pdn":
-        PDNWriter.to_string("", "", "", "", "", "", next_to_move, black_men,
-                            white_men, black_kings, white_kings, "",
-                            "white_on_top", [])
+                                detail="Invalid FEN string")
+    next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state()
+    fen = {
+        "fen":
+        translate_to_fen(next_to_move, black_men, white_men, black_kings, white_kings)
     }
     deta = Deta(starlette_config.get("DETA_SPACE_DATA_KEY"))
     db = deta.Base("raven_db")
-    d = db.put(pdn, "session")
+    d = db.put(fen, "session")
     return JSONResponse(d)
 
 
