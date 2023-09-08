@@ -137,8 +137,8 @@ async def get_checkerboard_state():
     if not result:
         return JSONResponse(status_code=404,
                             content={'message': 'Session not found.'})
-    reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.game_params_from_pdn(0)
+    reader = PDNReader(None)
+    game_params = reader.game_params_from_fen(result['fen'])
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
@@ -172,8 +172,8 @@ async def make_move(
         return JSONResponse(status_code=404,
                             content={'message': 'Session not found.'})
     # restore game from session
-    reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.game_params_from_pdn(0)
+    reader = PDNReader(None)
+    game_params = reader.game_params_from_fen(result['fen'])
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
@@ -197,13 +197,12 @@ async def make_move(
 
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state(
     )
-    pdn = {
-        "pdn":
-        PDNWriter.to_string('', '', '', '', '', '', next_to_move, black_men,
-                            white_men, black_kings, white_kings, '',
-                            'white_on_top', [])
+    fen = {
+        "fen":
+        translate_to_fen(next_to_move, black_men, white_men, black_kings,
+                         white_kings)
     }
-    d = db.put(pdn, "session")
+    d = db.put(fen, "session")
     return JSONResponse(d)
 
 
@@ -220,8 +219,8 @@ async def calc_move(search_time: Annotated[
         return JSONResponse(status_code=404,
                             content={'message': 'Session not found.'})
     # restore game from session
-    reader = PDNReader.from_string(result['pdn'])
-    game_params = reader.game_params_from_pdn(0)
+    reader = PDNReader(None)
+    game_params = reader.game_params_from_fen(result['fen'])
     board = Checkers()
     state = board.curr_state
     state.setup_game(game_params)
