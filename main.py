@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Union
 
 from deta import Deta
 from fastapi import FastAPI, HTTPException, Query
@@ -21,11 +21,10 @@ app.add_middleware(SessionMiddleware,
 
 @app.post("/create_session/")
 async def create_session(fen: Annotated[
-    str | None,
-    Query(
-        title="String in Forsyth-Edwards Notation (FEN)",
-        description="If string is None, then default is starting game position, and black to move."
-        )] = None):
+    Union[str, None],
+    Query(title="String in Forsyth-Edwards Notation (FEN)",
+          description="If string is None, then default is starting game " +
+          "position, and black to move.")] = None):
     board = Checkers()
     state = board.curr_state
     if fen is not None:
