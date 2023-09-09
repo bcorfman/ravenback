@@ -22,7 +22,7 @@ app.add_middleware(CORSMiddleware, allow_origins=origins,
                    allow_credentials=True,
                    allow_methods=['*'],
                    allow_headers=['*'],
-                   expose_headers=['Access-Control-Request-Method'])
+                   expose_headers=['Access-Control-Allow-Origin'])
 app.add_middleware(SessionMiddleware,
                    secret_key=starlette_config.get('SECRET_KEY'),
                    max_age=None,
