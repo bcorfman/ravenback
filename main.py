@@ -14,7 +14,6 @@ from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 starlette_config = Config('env.txt')
 app = FastAPI()
 origins = [
-    'http://localhost:6006', 'https://localhost:6006',
     'http://localhost:6007', 'https://localhost:6007',
     'http://react-checkerboard.vercel.app',
     'https://react-checkerboard.vercel.app'
