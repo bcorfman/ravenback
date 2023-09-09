@@ -14,15 +14,13 @@ from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 starlette_config = Config('env.txt')
 app = FastAPI()
 origins = [
-    'http://locahost:6006', 'https://locahost:6006',
+    'http://localhost:6006', 'https://localhost:6006',
     'http://react-checkerboard.vercel.app',
     'https://react-checkerboard.vercel.app'
 ]
 app.add_middleware(CORSMiddleware, allow_origins=origins,
-                   allow_credentials=True,
                    allow_methods=['*'],
-                   allow_headers=['*'],
-                   expose_headers=['Access-Control-Allow-Origin'])
+                   allow_headers=['*'])
 app.add_middleware(SessionMiddleware,
                    secret_key=starlette_config.get('SECRET_KEY'),
                    max_age=None,
