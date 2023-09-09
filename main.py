@@ -4,6 +4,7 @@ from deta import Deta
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from starlette.config import Config
+from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from game.checkers import Checkers, calc_ai_move
@@ -11,8 +12,10 @@ from parsing.PDN import PDNReader, PDNWriter, translate_to_fen
 from util.globalconst import BLACK, KING, MAN, WHITE, keymap, square_map
 
 starlette_config = Config('env.txt')
-
 app = FastAPI()
+app.add_middleware(CORSMiddleware, allow_origins=[starlette_config.get('ORIGIN')],
+                   allow_methods=['*'],
+                   allow_headers=['*'])
 app.add_middleware(SessionMiddleware,
                    secret_key=starlette_config.get('SECRET_KEY'),
                    max_age=None,
