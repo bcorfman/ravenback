@@ -21,14 +21,15 @@ origins = [
 app.add_middleware(CORSMiddleware, allow_origins=origins,
                    allow_credentials=True,
                    allow_methods=['*'],
-                   allow_headers=['*'])
+                   allow_headers=['*'],
+                   expose_headers=['Access-Control-Request-Method'])
 app.add_middleware(SessionMiddleware,
                    secret_key=starlette_config.get('SECRET_KEY'),
                    max_age=None,
                    same_site='Strict')
 
 
-@app.post("/create_session/")
+@app.post("/create_session")
 async def create_session(fen: Annotated[
     Union[str, None],
     Query(title="String in Forsyth-Edwards Notation (FEN)",
@@ -55,15 +56,15 @@ async def create_session(fen: Annotated[
     return JSONResponse(d)
 
 
-@app.post("/end_session/")
+@app.post("/end_session")
 async def end_session():
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base('raven_db')
     db.delete('session')
 
 
-# example - http://localhost:8000/legal_moves/?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29"
-@app.get("/legal_moves/")
+# example - http://localhost:8000/legal_moves?to_move=black&bm=11&bm=15&bk=19&bk=4&wm=30&wm=31&wk=29"
+@app.get("/legal_moves")
 async def legal_moves(
     to_move: Annotated[
         str,
@@ -138,7 +139,7 @@ async def legal_moves(
     return JSONResponse({"captures": captures, "moves": moves})
 
 
-@app.get("/cb_state/")
+@app.get("/cb_state")
 async def get_checkerboard_state():
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base('raven_db')
@@ -163,8 +164,8 @@ async def get_checkerboard_state():
     })
 
 
-# example - https://raven-1-j8079958.deta.app/make_move/?start_sq=11&end_sq=15"
-@app.post("/make_move/")
+# example - https://raven-1-j8079958.deta.app/make_move?start_sq=11&end_sq=15"
+@app.post("/make_move")
 async def make_move(
     start_sq: Annotated[
         int,
@@ -215,7 +216,7 @@ async def make_move(
     return JSONResponse(d)
 
 
-# example - https://raven-1-j8079958.deta.app/calc_move/?search_time=5"
+# example - https://raven-1-j8079958.deta.app/calc_move?search_time=5"
 @app.post("/calc_move/")
 async def calc_move(search_time: Annotated[
     int,
