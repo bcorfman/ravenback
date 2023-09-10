@@ -192,6 +192,24 @@ class PDNReader:
         else:
             raise SyntaxError("Unknown player type {player} in second set of FEN squares")
 
+        # validate FEN for repeated values, overlapping values, and any invalid ranges.
+        sbm, sbk = set(self._black_men), set(self._black_kings)
+        swm, swk = set(self._white_men), set(self._white_kings)
+        bm, bk = self._black_men, self._black_kings
+        wm, wk = self._white_men, self._white_kings
+        if len(bm) != len(sbm):
+            raise RuntimeError("Repeated values for black men")
+        if len(bk) != len(sbk):
+            raise RuntimeError("Repeated values for black kings")
+        if len(wm) != len(swm):
+            raise RuntimeError("Repeated values for white men")
+        if len(wk) != len(swk):
+            raise RuntimeError("Repeated values for white kings")
+        if len(bm + bk + wm + wk) != len(sbm | sbk | swm | swk):
+            raise RuntimeError("Overlapping checker values")
+        if not all(1 <= e <= 32 for e in sbm | sbk | swm | swk):
+            raise SyntaxError("Valid checker values range from 1-32")
+
     def _add_game_index(self, value):
         self._event = value
         self._game_indexes.append(self._stream_pos)
