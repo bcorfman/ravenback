@@ -16,8 +16,8 @@ app = FastAPI()
 origins = '(http://localhost:6007)|(https://localhost:6007)(http://react-checkerboard.vercel.app)|(https://react-checkerboard.vercel.app)|(https://.*\.github\.dev:6007)'
 
 app.add_middleware(CORSMiddleware, allow_origin_regex=origins,
-                   allow_methods=['*'],
-                   allow_headers=['*'])
+                   allow_methods=["GET", "POST", "OPTIONS"],
+                   allow_headers=["*"])
 app.add_middleware(SessionMiddleware,
                    secret_key=starlette_config.get('SECRET_KEY'),
                    max_age=None,
