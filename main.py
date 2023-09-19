@@ -13,13 +13,9 @@ from util.globalconst import keymap
 
 starlette_config = Config('env.txt')
 app = FastAPI()
-origins = [
-    'http://localhost:6007', 'https://localhost:6007',
-    'http://react-checkerboard.vercel.app',
-    'https://react-checkerboard.vercel.app',
-    'https://raven-1-j8079958.deta.app'
-]
-app.add_middleware(CORSMiddleware, allow_origins=origins,
+origins = '(http://localhost:6007)|(https://localhost:6007)(http://react-checkerboard.vercel.app)|(https://react-checkerboard.vercel.app)|(https://.*\.github\.dev:6007)'
+
+app.add_middleware(CORSMiddleware, allow_origin_regex=origins,
                    allow_methods=['*'],
                    allow_headers=['*'])
 app.add_middleware(SessionMiddleware,
