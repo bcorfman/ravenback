@@ -16,7 +16,8 @@ app = FastAPI()
 origins = [
     'http://localhost:6007', 'https://localhost:6007',
     'http://react-checkerboard.vercel.app',
-    'https://react-checkerboard.vercel.app'
+    'https://react-checkerboard.vercel.app',
+    'https://raven-1-j8079958.deta.app'
 ]
 app.add_middleware(CORSMiddleware, allow_origins=origins,
                    allow_methods=['*'],
