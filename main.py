@@ -1,6 +1,6 @@
 from typing import Annotated, Union
 
-from deta import Deta
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from starlette.config import Config
@@ -10,10 +10,11 @@ from starlette.middleware.sessions import SessionMiddleware
 from game.checkers import Checkers, calc_ai_move
 from parsing.PDN import PDNReader, PDNWriter, translate_to_fen
 from util.globalconst import keymap
+from util.tasks import dummy_task
 
 starlette_config = Config('env.txt')
 app = FastAPI()
-origins = '(http://localhost:6007)|(https://localhost:6007)(http://react-checkerboard.vercel.app)|(https://react-checkerboard.vercel.app)|(https://.*\.github\.dev:6007)'
+origins = '(redis://localhost:6379)|(https://localhost:6007)'
 
 app.add_middleware(CORSMiddleware, allow_origin_regex=origins,
                    allow_methods=["GET", "POST", "OPTIONS"],
@@ -22,6 +23,11 @@ app.add_middleware(SessionMiddleware,
                    secret_key=starlette_config.get('SECRET_KEY'),
                    max_age=None,
                    same_site='Strict')
+
+@app.post("/test-task")
+def submit_dummy_task():
+    task = dummy_task.kiq(3, 4)
+    return {"task_id": task.task_id, "message": "Task is being processed"}
 
 
 @app.post("/create_session")
@@ -43,7 +49,8 @@ async def create_session(fen: Annotated[
     next_to_move, black_men, black_kings, white_men, white_kings = state.save_board_state()
     fen = {
         "fen":
-        translate_to_fen(next_to_move, black_men, white_men, black_kings, white_kings)
+        translate_to_fen(next_to_move, black_men, white_men,
+                         black_kings, white_kings)
     }
     deta = Deta(starlette_config.get("DETA_SPACE_DATA_KEY"))
     db = deta.Base("raven_db")
@@ -75,7 +82,7 @@ async def legal_moves(fen: Annotated[
         except (SyntaxError, RuntimeError) as e:
             # exception message held in first element of args list
             raise HTTPException(status_code=422, detail=e.args[0])
-        
+
     captures = []
     for capture in board.curr_state.captures:
         jump = []
@@ -100,6 +107,7 @@ async def get_checkerboard_state():
     deta = Deta(starlette_config.get('DETA_SPACE_DATA_KEY'))
     db = deta.Base('raven_db')
     result = db.get('session')
+    result = True
     if not result:
         return JSONResponse(status_code=404,
                             content={'message': 'Session not found.'})

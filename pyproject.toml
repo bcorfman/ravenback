@@ -1,0 +1,23 @@
+[project]
+name = "ravenback"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "charset-normalizer>=3.4.0",
+    "fastapi>=0.115.6",
+    "httpx>=0.28.1",
+    "itsdangerous>=2.2.0",
+    "pyparsing>=3.2.0",
+    "redis>=5.2.1",
+    "redis-tasks>=0.0.11",
+    "uvicorn[standard]>=0.34.0",
+    "taskiq>=0.11.10",
+    "taskiq-fastapi>=0.3.3",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ipython>=8.31.0",
+]
